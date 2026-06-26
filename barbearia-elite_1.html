@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barbearia Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96E;
+    --gold-dim: rgba(201,168,76,0.15);
+    --dark: #0D0D0D;
+    --surface: #161616;
+    --surface2: #1E1E1E;
+    --border: rgba(201,168,76,0.2);
+    --text: #F0EDE8;
+    --text-muted: rgba(240,237,232,0.5);
+    --danger: #e05252;
+  }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,13,13,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    font-size: 22px;
+  }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+  }
+  .logo-sub {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    line-height: 1;
+  }
+
+  .header-right {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .user-chip {
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--gold-light);
+    display: none;
+    align-items: center; gap: 6px;
+  }
+  .user-chip.visible { display: flex; }
+
+  .btn-logout {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 8px;
+    padding: 6px 12px; cursor: pointer; font-size: 12px;
+    transition: 0.2s;
+    display: none;
+  }
+  .btn-logout.visible { display: block; }
+  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 64px 24px 48px;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  }
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 7vw, 64px);
+    font-weight: 900; line-height: 1.05;
+    background: linear-gradient(160deg, #fff 30%, var(--gold-light) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    color: var(--text-muted); font-size: 15px; max-width: 380px; margin: 0 auto 32px;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; color: var(--gold); display: block;
+  }
+  .stat-label {
+    font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    max-width: 1100px; margin: 0 auto;
+    padding: 48px 24px;
+    display: grid; gap: 48px;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── SERVICE CARDS ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--gold-dim); opacity: 0; transition: 0.2s;
+  }
+  .service-card:hover::before { opacity: 1; }
+  .service-card.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+  }
+  .service-card.selected::after {
+    content: '✓';
+    position: absolute; top: 10px; right: 12px;
+    font-size: 12px; color: var(--gold);
+    background: var(--gold-dim); border-radius: 50%;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .service-icon { font-size: 28px; margin-bottom: 10px; }
+  .service-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .service-time { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .service-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; color: var(--gold);
+  }
+
+  /* ── BARBER CARDS ── */
+  .barbers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .barber-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .barber-card:hover { border-color: rgba(201,168,76,0.5); }
+  .barber-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .barber-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    border: 2px solid var(--border);
+  }
+  .barber-card.selected .barber-avatar { border-color: var(--gold); }
+  .barber-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .barber-specialty { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .barber-stars { color: var(--gold); font-size: 12px; }
+
+  /* ── SCHEDULE ── */
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+  }
+  .time-slot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  .time-slot:hover:not(.taken) { border-color: rgba(201,168,76,0.5); }
+  .time-slot.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+  .time-slot.taken {
+    opacity: 0.35; cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .time-slot .slot-period { font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* ── DATE ROW ── */
+  .dates-row {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+  }
+  .date-pill {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 70px;
+    transition: 0.2s;
+  }
+  .date-pill:hover { border-color: rgba(201,168,76,0.5); }
+  .date-pill.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+  .date-day { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .date-num { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; gap: 12px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .field input, .field select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+  .field input::placeholder { color: var(--text-muted); }
+  .field select option { background: #1E1E1E; }
+
+  /* ── SUMMARY ── */
+  .summary-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-label { color: var(--text-muted); }
+  .summary-value { font-weight: 500; }
+  .summary-total .summary-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; color: var(--gold);
+  }
+  .empty-summary {
+    text-align: center; color: var(--text-muted);
+    font-size: 13px; padding: 16px 0;
+  }
+
+  /* ── BUTTON ── */
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: #0D0D0D;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 16px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 12px;
+    padding: 14px; width: 100%; cursor: pointer;
+    font-size: 14px; margin-top: 10px; transition: 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--gold-light); }
+
+  /* ── BOOKING LIST ── */
+  .booking-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .booking-name { font-weight: 600; font-size: 14px; }
+  .booking-details { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .booking-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; color: var(--gold); text-align: right;
+  }
+  .booking-status {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #5dbd7d; background: rgba(93,189,125,0.1);
+    border-radius: 4px; padding: 2px 8px; text-align: right; margin-top: 4px;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1a1a1a; border: 1px solid var(--gold);
+    color: var(--text); border-radius: 12px;
+    padding: 14px 20px; font-size: 13px;
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999; white-space: nowrap;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── PANEL SWITCH ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 4px;
+    margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1; padding: 9px; text-align: center;
+    font-size: 13px; cursor: pointer; border-radius: 9px;
+    color: var(--text-muted); transition: 0.2s;
+  }
+  .tab.active { background: var(--surface2); color: var(--text); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <span class="logo-icon">💈</span>
+    <div>
+      <span class="logo-text">Barbearia Elite</span>
+      <span class="logo-sub">Est. 2015 · Premium</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="user-chip" id="userChip">
+      <span>👤</span>
+      <span id="headerUserName"></span>
+    </div>
+    <button class="btn-logout" id="btnLogout" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">✦ O melhor da barbearia masculina ✦</p>
+  <h1>Estilo que fala<br>por você</h1>
+  <p>Cortes precisos, atendimento exclusivo e uma experiência que vai além da cadeira.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">8+</span><span class="stat-label">Anos de experiência</span></div>
+    <div class="stat"><span class="stat-num">4.9★</span><span class="stat-label">Avaliação média</span></div>
+    <div class="stat"><span class="stat-num">3.2k</span><span class="stat-label">Clientes atendidos</span></div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- PANEL: LOGIN -->
+  <div id="panelLogin" class="panel active">
+    <h2 class="section-title">Criar conta</h2>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="field">
+          <label>Nome completo</label>
+          <input type="text" id="nome" placeholder="João Silva">
+        </div>
+        <div class="field">
+          <label>Telefone / WhatsApp</label>
+          <input type="text" id="telefone" placeholder="(11) 99999-9999" oninput="mascaraTel(this)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>E-mail (opcional)</label>
+          <input type="email" id="email" placeholder="joao@email.com">
+        </div>
+        <div class="field">
+          <label>Como nos conheceu?</label>
+          <select id="origem">
+            <option value="">Selecione</option>
+            <option>Instagram</option>
+            <option>Indicação de amigo</option>
+            <option>Google</option>
+            <option>Passando na rua</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="cadastrar()">Continuar para agendamento →</button>
+  </div>
+
+  <!-- PANEL: BOOKING -->
+  <div id="panelBooking" class="panel">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" id="tab1" onclick="switchTab(1)">1 · Serviço</div>
+      <div class="tab" id="tab2" onclick="switchTab(2)">2 · Barbeiro</div>
+      <div class="tab" id="tab3" onclick="switchTab(3)">3 · Data & Hora</div>
+      <div class="tab" id="tab4" onclick="switchTab(4)">4 · Confirmar</div>
+    </div>
+
+    <!-- STEP 1: SERVICES -->
+    <div id="step1">
+      <h2 class="section-title">Escolha o serviço</h2>
+      <div class="services-grid" id="servicesGrid"></div>
+    </div>
+
+    <!-- STEP 2: BARBERS -->
+    <div id="step2" style="display:none">
+      <h2 class="section-title">Escolha o barbeiro</h2>
+      <div class="barbers-grid" id="barbersGrid"></div>
+    </div>
+
+    <!-- STEP 3: DATE & TIME -->
+    <div id="step3" style="display:none">
+      <h2 class="section-title">Data</h2>
+      <div class="dates-row" id="datesRow"></div>
+
+      <h2 class="section-title" style="margin-top:28px">Horário disponível</h2>
+      <div class="schedule-grid" id="scheduleGrid"></div>
+    </div>
+
+    <!-- STEP 4: CONFIRM -->
+    <div id="step4" style="display:none">
+      <h2 class="section-title">Confirmar agendamento</h2>
+      <div class="summary-box" id="summaryBox"></div>
+      <button class="btn-primary" onclick="confirmar()">Confirmar agendamento</button>
+      <button class="btn-secondary" onclick="switchTab(1)">← Alterar</button>
+    </div>
+
+    <!-- NEXT BUTTON (steps 1-3) -->
+    <button class="btn-primary" id="btnNext" onclick="nextStep()" style="display:none">Próximo →</button>
+
+  </div>
+
+  <!-- PANEL: MY BOOKINGS -->
+  <div id="panelMyBookings" class="panel">
+    <h2 class="section-title">Meus agendamentos</h2>
+    <div id="myBookingsList"><p style="color:var(--text-muted);font-size:13px">Nenhum agendamento ainda.</p></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- SECTION: ALL BOOKINGS (admin view) -->
+<div class="main" id="allBookingsSection" style="display:none; padding-top:0">
+  <h2 class="section-title">Agenda do dia</h2>
+  <div id="allBookingsList"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
+
+<script>
+/* ─── DATA ─── */
+const SERVICES = [
+  { id:'corte',    icon:'✂️',  name:'Corte Clássico',   time:'30 min', price:45 },
+  { id:'barba',    icon:'🪒',  name:'Barba',             time:'20 min', price:35 },
+  { id:'combo',    icon:'💈',  name:'Corte + Barba',     time:'50 min', price:70 },
+  { id:'navalhado',icon:'🔪',  name:'Navalhado Premium', time:'40 min', price:55 },
+  { id:'pele',     icon:'🧴',  name:'Limpeza de Pele',  time:'30 min', price:50 },
+  { id:'pigmento', icon:'🎨',  name:'Pigmentação',       time:'25 min', price:40 },
+];
+
+const BARBERS = [
+  { id:'carlos', name:'Carlos',  specialty:'Degradê & Riscos', stars:'★★★★★', avatar:'🧔' },
+  { id:'joao',   name:'João',    specialty:'Barba & Navalha',  stars:'★★★★★', avatar:'👨‍🦱' },
+  { id:'pedro',  name:'Pedro',   specialty:'Cortes Modernos',  stars:'★★★★☆', avatar:'👨' },
+];
+
+const TIMES = [
+  { t:'09:00', p:'Manhã' },{ t:'09:30', p:'Manhã' },{ t:'10:00', p:'Manhã' },
+  { t:'10:30', p:'Manhã' },{ t:'11:00', p:'Manhã' },{ t:'11:30', p:'Manhã' },
+  { t:'14:00', p:'Tarde' },{ t:'14:30', p:'Tarde' },{ t:'15:00', p:'Tarde' },
+  { t:'15:30', p:'Tarde' },{ t:'16:00', p:'Tarde' },{ t:'16:30', p:'Tarde' },
+  { t:'17:00', p:'Tarde' },
+];
+
+/* ─── STATE ─── */
+let usuario = null;
+let agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]');
+let sel = { service: null, barber: null, date: null, time: null };
+let currentStep = 1;
+
+/* ─── INIT ─── */
+window.onload = () => {
+  const saved = localStorage.getItem('usuario');
+  if (saved) {
+    usuario = JSON.parse(saved);
+    goToBooking();
+  }
+  renderServices();
+  renderBarbers();
+  renderDates();
+};
+
+/* ─── MASKS ─── */
+function mascaraTel(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length > 11) v = v.slice(0,11);
+  if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+  else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+  else if (v.length > 0) v = `(${v}`;
+  el.value = v;
+}
+
+/* ─── AUTH ─── */
+function cadastrar() {
+  const nome = document.getElementById('nome').value.trim();
+  const telefone = document.getElementById('telefone').value.trim();
+  if (!nome || !telefone) { showToast('⚠️ Preencha nome e telefone'); return; }
+  usuario = {
+    nome, telefone,
+    email: document.getElementById('email').value.trim(),
+    origem: document.getElementById('origem').value,
+  };
+  localStorage.setItem('usuario', JSON.stringify(usuario));
+  goToBooking();
+  showToast('✅ Conta criada com sucesso!');
+}
+
+function logout() {
+  localStorage.removeItem('usuario');
+  usuario = null;
+  sel = { service:null, barber:null, date:null, time:null };
+  document.getElementById('panelLogin').classList.add('active');
+  document.getElementById('panelBooking').classList.remove('active');
+  document.getElementById('panelMyBookings').classList.remove('active');
+  document.getElementById('allBookingsSection').style.display = 'none';
+  document.getElementById('userChip').classList.remove('visible');
+  document.getElementById('btnLogout').classList.remove('visible');
+  switchTab(1);
+}
+
+function goToBooking() {
+  document.getElementById('panelLogin').classList.remove('active');
+  document.getElementById('panelBooking').classList.add('active');
+  document.getElementById('panelMyBookings').classList.add('active');
+  document.getElementById('allBookingsSection').style.display = 'block';
+  document.getElementById('userChip').classList.add('visible');
+  document.getElementById('headerUserName').textContent = usuario.nome.split(' ')[0];
+  document.getElementById('btnLogout').classList.add('visible');
+  renderMyBookings();
+  renderAllBookings();
+  switchTab(1);
+}
+
+/* ─── RENDER SERVICES ─── */
+function renderServices() {
+  const g = document.getElementById('servicesGrid');
+  g.innerHTML = SERVICES.map(s => `
+    <div class="service-card" id="svc-${s.id}" onclick="selectService('${s.id}')">
+      <div class="service-icon">${s.icon}</div>
+      <div class="service-name">${s.name}</div>
+      <div class="service-time">⏱ ${s.time}</div>
+      <div class="service-price">R$ ${s.price}</div>
+    </div>`).join('');
+}
+
+function selectService(id) {
+  sel.service = id;
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('svc-'+id).classList.add('selected');
+  updateNextBtn();
+}
+
+/* ─── RENDER BARBERS ─── */
+function renderBarbers() {
+  const g = document.getElementById('barbersGrid');
+  g.innerHTML = BARBERS.map(b => `
+    <div class="barber-card" id="brb-${b.id}" onclick="selectBarber('${b.id}')">
+      <div class="barber-avatar">${b.avatar}</div>
+      <div class="barber-name">${b.name}</div>
+      <div class="barber-specialty">${b.specialty}</div>
+      <div class="barber-stars">${b.stars}</div>
+    </div>`).join('');
+}
+
+function selectBarber(id) {
+  sel.barber = id;
+  document.querySelectorAll('.barber-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('brb-'+id).classList.add('selected');
+  updateNextBtn();
+}
+
+/* ─── RENDER DATES ─── */
+function renderDates() {
+  const row = document.getElementById('datesRow');
+  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const today = new Date();
+  row.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    const label = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : days[d.getDay()];
+    const dateStr = d.toISOString().slice(0,10);
+    row.innerHTML += `
+      <div class="date-pill" id="date-${dateStr}" onclick="selectDate('${dateStr}','${label}')">
+        <div class="date-day">${label}</div>
+        <div class="date-num">${d.getDate()}</div>
+      </div>`;
+  }
+}
+
+function selectDate(dateStr, label) {
+  sel.date = dateStr;
+  sel.time = null;
+  document.querySelectorAll('.date-pill').forEach(c => c.classList.remove('selected'));
+  document.getElementById('date-'+dateStr).classList.add('selected');
+  renderTimeSlots();
+  updateNextBtn();
+}
+
+/* ─── RENDER TIMES ─── */
+function renderTimeSlots() {
+  const g = document.getElementById('scheduleGrid');
+  const takenTimes = agendamentos
+    .filter(a => a.date === sel.date && a.barber === sel.barber)
+    .map(a => a.time);
+
+  g.innerHTML = TIMES.map(ts => {
+    const taken = takenTimes.includes(ts.t);
+    return `
+      <div class="time-slot${taken?' taken':''}" id="slot-${ts.t.replace(':','')}"
+        onclick="${taken?'':'selectTime(\''+ts.t+'\')'}">
+        ${ts.t}
+        <span class="slot-period">${taken ? 'Ocupado' : ts.p}</span>
+      </div>`;
+  }).join('');
+}
+
+function selectTime(t) {
+  sel.time = t;
+  document.querySelectorAll('.time-slot').forEach(c => c.classList.remove('selected'));
+  const id = 'slot-'+t.replace(':','');
+  document.getElementById(id).classList.add('selected');
+  updateNextBtn();
+}
+
+/* ─── TABS / STEPS ─── */
+function switchTab(n) {
+  currentStep = n;
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+    document.getElementById('tab'+i).classList.toggle('active', i===n);
+  });
+  document.getElementById('btnNext').style.display = n < 4 ? 'block' : 'none';
+  if (n === 4) renderSummary();
+  updateNextBtn();
+}
+
+function nextStep() {
+  if (currentStep === 1 && !sel.service) { showToast('⚠️ Escolha um serviço'); return; }
+  if (currentStep === 2 && !sel.barber)  { showToast('⚠️ Escolha um barbeiro'); return; }
+  if (currentStep === 3 && (!sel.date || !sel.time)) { showToast('⚠️ Escolha data e horário'); return; }
+  switchTab(currentStep + 1);
+}
+
+function updateNextBtn() {
+  const btn = document.getElementById('btnNext');
+  if (currentStep >= 4) { btn.style.display = 'none'; return; }
+  const ok = (currentStep===1 && sel.service) || (currentStep===2 && sel.barber) || (currentStep===3 && sel.date && sel.time);
+  btn.disabled = !ok;
+}
+
+/* ─── SUMMARY ─── */
+function renderSummary() {
+  const box = document.getElementById('summaryBox');
+  if (!sel.service || !sel.barber || !sel.date || !sel.time) {
+    box.innerHTML = '<p class="empty-summary">Volte e complete todas as etapas.</p>'; return;
+  }
+  const svc = SERVICES.find(s => s.id === sel.service);
+  const brb = BARBERS.find(b => b.id === sel.barber);
+  const dateObj = new Date(sel.date + 'T12:00:00');
+  const dateFmt = dateObj.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+  box.innerHTML = `
+    <div class="summary-row"><span class="summary-label">Cliente</span><span class="summary-value">${usuario.nome}</span></div>
+    <div class="summary-row"><span class="summary-label">Serviço</span><span class="summary-value">${svc.icon} ${svc.name}</span></div>
+    <div class="summary-row"><span class="summary-label">Duração</span><span class="summary-value">${svc.time}</span></div>
+    <div class="summary-row"><span class="summary-label">Barbeiro</span><span class="summary-value">${brb.avatar} ${brb.name}</span></div>
+    <div class="summary-row"><span class="summary-label">Data</span><span class="summary-value">${dateFmt}</span></div>
+    <div class="summary-row"><span class="summary-label">Horário</span><span class="summary-value">🕐 ${sel.time}</span></div>
+    <div class="summary-row summary-total"><span class="summary-label">Total</span><span class="summary-value">R$ ${svc.price}</span></div>
+  `;
+}
+
+/* ─── CONFIRM ─── */
+function confirmar() {
+  if (!sel.service || !sel.barber || !sel.date || !sel.time) {
+    showToast('⚠️ Complete todas as etapas'); return;
+  }
+  const conflict = agendamentos.find(a => a.barber === sel.barber && a.date === sel.date && a.time === sel.time);
+  if (conflict) { showToast('⚠️ Horário já ocupado!'); return; }
+
+  const svc = SERVICES.find(s => s.id === sel.service);
+  const brb = BARBERS.find(b => b.id === sel.barber);
+
+  agendamentos.push({
+    id: Date.now(),
+    nome: usuario.nome,
+    service: svc.name,
+    serviceIcon: svc.icon,
+    barber: sel.barber,
+    barberName: brb.name,
+    date: sel.date,
+    time: sel.time,
+    price: svc.price,
+  });
+  localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+
+  sel = { service:null, barber:null, date:null, time:null };
+  renderServices();
+  renderBarbers();
+  renderDates();
+  renderMyBookings();
+  renderAllBookings();
+  showToast('✅ Agendamento confirmado!');
+  switchTab(1);
+}
+
+/* ─── BOOKINGS LISTS ─── */
+function renderMyBookings() {
+  const el = document.getElementById('myBookingsList');
+  const mine = agendamentos.filter(a => a.nome === usuario.nome);
+  if (!mine.length) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Nenhum agendamento ainda. Agende acima! ☝️</p>';
+    return;
+  }
+  el.innerHTML = mine.map(a => bookingCardHTML(a)).join('');
+}
+
+function renderAllBookings() {
+  const el = document.getElementById('allBookingsList');
+  const sorted = [...agendamentos].sort((a,b) => a.time.localeCompare(b.time));
+  if (!sorted.length) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Nenhum agendamento na agenda.</p>';
+    return;
+  }
+  el.innerHTML = sorted.map(a => bookingCardHTML(a)).join('');
+}
+
+function bookingCardHTML(a) {
+  const brb = BARBERS.find(b => b.id === a.barber);
+  const dateObj = new Date(a.date + 'T12:00:00');
+  const dateFmt = dateObj.toLocaleDateString('pt-BR',{day:'numeric',month:'short'});
+  return `
+    <div class="booking-card">
+      <div>
+        <div class="booking-name">${a.nome}</div>
+        <div class="booking-details">${a.serviceIcon} ${a.service} · ${brb ? brb.avatar : ''} ${a.barberName} · ${dateFmt} às ${a.time}</div>
+      </div>
+      <div>
+        <div class="booking-price">R$${a.price}</div>
+        <div class="booking-status">Confirmado</div>
+      </div>
+    </div>`;
+}
+
+/* ─── TOAST ─── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
